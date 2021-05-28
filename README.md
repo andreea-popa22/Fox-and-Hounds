@@ -5,7 +5,7 @@ This is a two player game, one representing the fox and the other representing t
 - Each player can move only one piece while their turn 
 - The game starts like this (where the fox is the red piece and the hounds are the black ones): 
 
-![](ss1.png)
+![](https://user-images.githubusercontent.com/61750293/120048386-a0d89600-c01f-11eb-956d-b55c27df5a76.png)
 
 - The fox makes the first move
 - The hounds can move only forward diagonally, and the fox can either go forward or backward diagonally one square.
@@ -14,8 +14,8 @@ This is a two player game, one representing the fox and the other representing t
 
 <center> Example of fox winning: </center>
 
-![](ss2.png)
+![](https://user-images.githubusercontent.com/61750293/120048414-bbab0a80-c01f-11eb-9b35-72f7ba0856f6.png)
 
 <center> Example of hounds winning: </center>
 
-![](ss3.png)
+![](https://user-images.githubusercontent.com/61750293/120048448-c82f6300-c01f-11eb-99f9-fd9f63c631c9.png)
