@@ -19,3 +19,5 @@ This is a two player game, one representing the fox and the other representing t
 <center> Example of hounds winning: </center>
 
 ![](https://user-images.githubusercontent.com/61750293/120048448-c82f6300-c01f-11eb-99f9-fd9f63c631c9.png)
+
+The game is implemented using Minimax and Alpha-Beta algorithms.
