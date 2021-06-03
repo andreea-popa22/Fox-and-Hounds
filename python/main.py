@@ -5,13 +5,14 @@ import pygame, sys
 ADANCIME_MAX = 6
 
 
-# def elem_identice(lista):
-#     if (all(elem == lista[0] for elem in lista[1:])):
-#         return lista[0] if lista[0] != Joc.GOL else False
-#     return False
+def elem_identice(lista):
+    if (all(elem == lista[0] for elem in lista[1:])):
+        return lista[0] if lista[0] != Joc.GOL else False
+    return False
 
 
 class Joc:
+    celuleGrid = None
     NR_COLOANE = 8
     JMIN = None
     JMAX = None
@@ -48,8 +49,9 @@ class Joc:
             elif self.matr[linie][coloana] == 'f':
                 self.__class__.display.blit(self.__class__.fox_img, (
                 coloana * (self.__class__.dim_celula + 1), linie * (self.__class__.dim_celula + 1)))
-        pygame.display.flip()
         pygame.display.update()
+        pygame.display.flip()
+
 
     def __init__(self, tabla=None):
         if tabla:
@@ -63,8 +65,6 @@ class Joc:
                     elif linie % 2 == 0 and coloana % 2 == 0 or linie % 2 == 1 and coloana % 2 == 1:
                         self.matr[linie][coloana] = self.__class__.DENIED
             self.matr[7][0] = 'f'
-            for x in self.matr:
-                print(x)
 
     @classmethod
     def jucator_opus(cls, jucator):
@@ -97,7 +97,7 @@ class Joc:
                             p3 = True #vulpea e blocata in nord est de marginea tablei
                     else:
                         p1 = p3 = True
-                    if i + 1 >= 7:
+                    if i + 1 <= 7:
                         if j - 1 >= 0:
                             if self.matr[i+1][j-1] == 'h':
                                 p2 = True
@@ -140,7 +140,7 @@ class Joc:
                                 matr_tabla_noua[i-1][j+1] = 'f'
                                 l_mutari.append(matr_tabla_noua)
                                 matr_tabla_noua[i-1][j+1] = '#'
-                        if i+1 >= 7:
+                        if i+1 <= 7:
                             if j - 1 >= 0: #sud vest
                                 matr_tabla_noua[i+1][j-1] = 'f'
                                 l_mutari.append(matr_tabla_noua)
@@ -171,15 +171,15 @@ class Joc:
             return 1
         return 0
 
-    # def linii_deschise(self, jucator):
-    #     return (self.linie_deschisa(self.matr[0:3], jucator)
-    #             + self.linie_deschisa(self.matr[3:6], jucator)
-    #             + self.linie_deschisa(self.matr[6:9], jucator)
-    #             + self.linie_deschisa(self.matr[0:9:3], jucator)
-    #             + self.linie_deschisa(self.matr[1:9:3], jucator)
-    #             + self.linie_deschisa(self.matr[2:9:3], jucator)
-    #             + self.linie_deschisa(self.matr[0:9:4], jucator)
-    #             + self.linie_deschisa(self.matr[2:8:2], jucator))
+    def linii_deschise(self, jucator):
+        return (self.linie_deschisa(self.matr[0:3], jucator)
+                + self.linie_deschisa(self.matr[3:6], jucator)
+                + self.linie_deschisa(self.matr[6:9], jucator)
+                + self.linie_deschisa(self.matr[0:9:3], jucator)
+                + self.linie_deschisa(self.matr[1:9:3], jucator)
+                + self.linie_deschisa(self.matr[2:9:3], jucator)
+                + self.linie_deschisa(self.matr[0:9:4], jucator)
+                + self.linie_deschisa(self.matr[2:8:2], jucator))
 
     def estimeaza_scor(self, adancime):
         t_final = self.final()
@@ -188,28 +188,19 @@ class Joc:
             return (99 + adancime)
         elif t_final == self.__class__.JMIN:
             return (-99 - adancime)
-        elif t_final == 'remiza':
-            return 0
         else:
             return (self.linii_deschise(self.__class__.JMAX) - self.linii_deschise(self.__class__.JMIN))
 
-    # def __str__(self):
-    #     sir = (" ".join([str(x) for x in self.matr[0:7][0]]) + "\n" +
-    #            " ".join([str(x) for x in self.matr[0:7][1]]) + "\n" +
-    #            " ".join([str(x) for x in self.matr[0:7][2]]) + "\n" +
-    #            " ".join([str(x) for x in self.matr[0:7][3]]) + "\n" +
-    #            " ".join([str(x) for x in self.matr[0:7][4]]) + "\n" +
-    #            " ".join([str(x) for x in self.matr[0:7][5]]) + "\n" +
-    #            " ".join([str(x) for x in self.matr[0:7][6]]) + "\n" +
-    #            " ".join([str(x) for x in self.matr[0:7][7]]) + "\n")
-    #     return sir
-
-def elimina_f(m):
-    for i in range(8):
-        for j in range(8):
-            if m[i][j] == 'f':
-                m[i][j] = '#'
-    return m
+    def __str__(self):
+        sir = (" ".join([str(x) for x in self.matr[0:7][0]]) + "\n" +
+               " ".join([str(x) for x in self.matr[0:7][1]]) + "\n" +
+               " ".join([str(x) for x in self.matr[0:7][2]]) + "\n" +
+               " ".join([str(x) for x in self.matr[0:7][3]]) + "\n" +
+               " ".join([str(x) for x in self.matr[0:7][4]]) + "\n" +
+               " ".join([str(x) for x in self.matr[0:7][5]]) + "\n" +
+               " ".join([str(x) for x in self.matr[0:7][6]]) + "\n" +
+               " ".join([str(x) for x in self.matr[-1][0:8]]) + "\n")
+        return sir
 
 
 class Stare:
@@ -262,14 +253,11 @@ def alpha_beta(alpha, beta, stare):
         return stare  # este intr-un interval invalid deci nu o mai procesez
 
     stare.mutari_posibile = stare.mutari()
-
     if stare.j_curent == Joc.JMAX:
         estimare_curenta = float('-inf')
-
         for mutare in stare.mutari_posibile:
             # calculeaza estimarea pentru starea noua, realizand subarborele
             stare_noua = alpha_beta(alpha, beta, mutare)
-
             if (estimare_curenta < stare_noua.estimare):
                 stare.stare_aleasa = stare_noua
                 estimare_curenta = stare_noua.estimare
@@ -280,34 +268,27 @@ def alpha_beta(alpha, beta, stare):
 
     elif stare.j_curent == Joc.JMIN:
         estimare_curenta = float('inf')
-
         for mutare in stare.mutari_posibile:
-
             stare_noua = alpha_beta(alpha, beta, mutare)
-
             if (estimare_curenta > stare_noua.estimare):
                 stare.stare_aleasa = stare_noua
                 estimare_curenta = stare_noua.estimare
-
             if (beta > stare_noua.estimare):
                 beta = stare_noua.estimare
                 if alpha >= beta:
                     break
     stare.estimare = stare.stare_aleasa.estimare
-
     return stare
 
 
 def afis_daca_final(stare_curenta):
     final = stare_curenta.tabla_joc.final()
-    if (final):
-        if (final == "remiza"):
-            print("Remiza!")
+    if (final != "no"):
+        if (final == "hounds"):
+            print("Au castigat cainii!")
         else:
-            print("A castigat " + final)
-
+            print("A castigat vulpea!")
         return True
-
     return False
 
 
@@ -398,8 +379,8 @@ def deseneaza_alegeri(display, tabla_curenta):
         top=300,
         left=250,
         listaButoane=[
-            Buton(display=display, w=120, h=50, text="Fox", valoare="fox"),
-            Buton(display=display, w=120, h=50, text="Hounds", valoare="hounds")
+            Buton(display=display, w=120, h=50, text="Fox", valoare='f'),
+            Buton(display=display, w=120, h=50, text="Hounds", valoare='h')
         ],
         indiceSelectat=0)
     btn_nvl = GrupButoane(
@@ -442,6 +423,13 @@ def calculeaza_adancime(nivel = "usor"):
         h = 3
     return h
 
+def elimina_pion(m, juc, linie, coloana):
+    for i in range(8):
+        for j in range(8):
+            if m[i][j] == juc:
+                m[i][j] = '#'
+    return m
+
 
 def main():
     pygame.init()
@@ -450,73 +438,62 @@ def main():
     w = 100
     ecran = pygame.display.set_mode(size=(nc * (w + 1) - 1, nc * (w + 1) - 1))
     Joc.initializeaza(ecran, nc)
-
-
     tabla_curenta = Joc()
     Joc.JMIN, tip_algoritm, nivel = deseneaza_alegeri(ecran, tabla_curenta)
     ADANCIME_MAX = calculeaza_adancime(nivel)
     print(Joc.JMIN, tip_algoritm)
 
-    Joc.JMAX = 'fox' if Joc.JMIN == 'hounds' else 'hounds'
-
+    Joc.JMAX = 'f' if Joc.JMIN == 'h' else 'h'
     print("Tabla initiala")
     print(str(tabla_curenta))
-
-    stare_curenta = Stare(tabla_curenta, 'hounds', ADANCIME_MAX)
-
+    stare_curenta = Stare(tabla_curenta, 'f', ADANCIME_MAX)
     tabla_curenta.deseneaza_grid()
-    de_mutat = False
-    # while True:
-    #
-    #     if (stare_curenta.j_curent == Joc.JMIN):
-    #         for event in pygame.event.get():
-    #             if event.type == pygame.QUIT:
-    #                 pygame.quit()
-    #                 sys.exit()
-    #             elif event.type == pygame.MOUSEBUTTONDOWN:
-    #                 pos = pygame.mouse.get_pos()
-    #                 for np in range(len(Joc.celuleGrid)):
-    #                     if Joc.celuleGrid[np].collidepoint(pos):
-    #                         linie = Joc.__class__.NR_COLOANE
-    #                         coloana = Joc.__class__.NR_COLOANE
-    #
-    #                         if stare_curenta.tabla_joc.matr[np] == Joc.JMIN:
-    #                             if (de_mutat and linie == de_mutat[0] and coloana == de_mutat[1]):
-    #                                 de_mutat = False
-    #                                 stare_curenta.tabla_joc.deseneaza_grid()
-    #                             else:
-    #                                 de_mutat = (linie, coloana)
-    #                                 stare_curenta.tabla_joc.deseneaza_grid(np)
-    #                         if stare_curenta.tabla_joc.matr[np] == Joc.GOL:
-    #                             if de_mutat:
-    #                                 stare_curenta.tabla_joc.matr[linie][coloana] = Joc.GOL
-    #                                 de_mutat = False
-    #                             stare_curenta.tabla_joc.matr[linie][coloana] = Joc.JMIN
-    #
-    #                             print("\nTabla dupa mutarea jucatorului")
-    #                             print(str(stare_curenta))
-    #
-    #                             stare_curenta.tabla_joc.deseneaza_grid()
-    #                             if (afis_daca_final(stare_curenta)):
-    #                                 break
-    #                             stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
-    #
-    #     else:
-    #         t_inainte = int(round(time.time() * 1000))
-    #         if tip_algoritm == '1':
-    #             stare_actualizata = min_max(stare_curenta)
-    #         else:
-    #             stare_actualizata = alpha_beta(-500, 500, stare_curenta)
-    #         stare_curenta.tabla_joc = stare_actualizata.stare_aleasa.tabla_joc
-    #         print("Tabla dupa mutarea calculatorului")
-    #         print(str(stare_curenta))
-    #
-    #         stare_curenta.tabla_joc.deseneaza_grid()
-    #         t_dupa = int(round(time.time() * 1000))
-    #         print("Calculatorul a \"gandit\" timp de " + str(t_dupa - t_inainte) + " milisecunde.")
-    #         if (afis_daca_final(stare_curenta)):
-    #             break
-    #         stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
+    pozitie_anterioara = [['f', 7, 0], ['h', 0, 1]]
+    while True:
+        if stare_curenta.j_curent == Joc.JMIN:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
+                    for np in range(len(Joc.celuleGrid)):
+                        if Joc.celuleGrid[np].collidepoint(pos):
+                            linie = np // 8
+                            coloana = np % 8
+                            if stare_curenta.tabla_joc.matr[linie][coloana] == Joc.GOL:
+                                stare_curenta.tabla_joc.matr[linie][coloana] = Joc.JMIN
+                                for x in pozitie_anterioara:
+                                    if x[0] == Joc.JMIN:
+                                        l = x[1]
+                                        c = x[2]
+                                        stare_curenta.tabla_joc.matr[l][c] = '#'
+                                        x[1] = linie
+                                        x[2] = coloana
+                                stare_curenta.tabla_joc.deseneaza_grid()
+                                print("\nTabla dupa mutarea jucatorului")
+                                print(str(stare_curenta))
+                                stare_curenta.tabla_joc.deseneaza_grid()
+                                if (afis_daca_final(stare_curenta)):
+                                    break
+                                stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
+
+        else:
+            t_inainte = int(round(time.time() * 1000))
+            if tip_algoritm == "minimax":
+                stare_actualizata = min_max(stare_curenta)
+            else:
+                stare_actualizata = alpha_beta(-500, 500, stare_curenta)
+            stare_curenta.tabla_joc = stare_actualizata.stare_aleasa.tabla_joc
+            print("Tabla dupa mutarea calculatorului")
+            print(str(stare_curenta))
+
+            stare_curenta.tabla_joc.deseneaza_grid()
+            t_dupa = int(round(time.time() * 1000))
+            print("Calculatorul a \"gandit\" timp de " + str(t_dupa - t_inainte) + " milisecunde.")
+            if (afis_daca_final(stare_curenta)):
+                break
+            stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
 
 if __name__ == "__main__":
     main()
