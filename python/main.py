@@ -115,10 +115,10 @@ class Joc:
 
                     #verific daca vulpea a depasit toti cainii
                     positions = self.get_hounds_pos()
-                    h1 = True if i >= positions[0][0] else False
-                    h2 = True if i >= positions[1][0] else False
-                    h3 = True if i >= positions[2][0] else False
-                    h4 = True if i >= positions[3][0] else False
+                    h1 = True if i <= positions[0][0] else False
+                    h2 = True if i <= positions[1][0] else False
+                    h3 = True if i <= positions[2][0] else False
+                    h4 = True if i <= positions[3][0] else False
                     if h1 == True and h2 == True and h3 == True and h4 == True:
                         return "fox"
         return "no"
@@ -181,15 +181,28 @@ class Joc:
                 + self.linie_deschisa(self.matr[0:9:4], jucator)
                 + self.linie_deschisa(self.matr[2:8:2], jucator))
 
-    def estimeaza_scor(self, adancime):
+    def estimeaza_scor(self, adancime, juc):
+        if juc == 'f':
+            return self.estimeaza_scor_f(adancime)
+        return self.estimeaza_scor_h(adancime)
+
+    def estimeaza_scor_f(self, adancime):
         t_final = self.final()
-        # if (adancime==0):
-        if t_final == self.__class__.JMAX:
-            return (99 + adancime)
-        elif t_final == self.__class__.JMIN:
-            return (-99 - adancime)
+        if t_final == self.JMAX:
+            return 100 + adancime
+        elif t_final == self.JMIN:
+            return -100 - adancime
         else:
-            return (self.linii_deschise(self.__class__.JMAX) - self.linii_deschise(self.__class__.JMIN))
+            return 1
+
+    def estimeaza_scor_h(self, adancime):
+        t_final = self.final()
+        if t_final == self.JMAX:
+            return 100 + adancime
+        elif t_final == self.JMIN:
+            return -100 - adancime
+        else:
+            return 1
 
     def __str__(self):
         sir = (" ".join([str(x) for x in self.matr[0:7][0]]) + "\n" +
@@ -283,13 +296,14 @@ def alpha_beta(alpha, beta, stare):
 
 def afis_daca_final(stare_curenta):
     final = stare_curenta.tabla_joc.final()
-    if (final != "no"):
-        if (final == "hounds"):
-            print("Au castigat cainii!")
-        else:
-            print("A castigat vulpea!")
+    if final == "no":
+        return False
+    if final == "fox":
+        print("A castigat vulpea!")
         return True
-    return False
+    if final == "hounds":
+        print("Au castigat cainii!")
+        return True
 
 
 class Buton:
@@ -423,12 +437,11 @@ def calculeaza_adancime(nivel = "usor"):
         h = 3
     return h
 
-def elimina_pion(m, juc, linie, coloana):
-    for i in range(8):
-        for j in range(8):
-            if m[i][j] == juc:
-                m[i][j] = '#'
-    return m
+
+def validare(l, c, linie, coloana):
+    if (l-1 == linie and c-1 == coloana) or (l-1 == linie and c+1 == coloana) or (l+1 == linie and c-1 == coloana) or (l+1 == linie and c+1 == coloana):
+        return True
+    return False
 
 
 def main():
@@ -461,39 +474,39 @@ def main():
                         if Joc.celuleGrid[np].collidepoint(pos):
                             linie = np // 8
                             coloana = np % 8
-                            if stare_curenta.tabla_joc.matr[linie][coloana] == Joc.GOL:
-                                stare_curenta.tabla_joc.matr[linie][coloana] = Joc.JMIN
-                                for x in pozitie_anterioara:
-                                    if x[0] == Joc.JMIN:
-                                        l = x[1]
-                                        c = x[2]
+                            for x in pozitie_anterioara:
+                                if x[0] == Joc.JMIN:
+                                    l = x[1]
+                                    c = x[2]
+                                    if validare(l, c, linie, coloana):
                                         stare_curenta.tabla_joc.matr[l][c] = '#'
                                         x[1] = linie
                                         x[2] = coloana
-                                stare_curenta.tabla_joc.deseneaza_grid()
-                                print("\nTabla dupa mutarea jucatorului")
-                                print(str(stare_curenta))
-                                stare_curenta.tabla_joc.deseneaza_grid()
-                                if (afis_daca_final(stare_curenta)):
-                                    break
-                                stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
+                                        stare_curenta.tabla_joc.matr[linie][coloana] = Joc.JMIN
+                                        stare_curenta.tabla_joc.deseneaza_grid()
+                                        print("\nTabla dupa mutarea jucatorului")
+                                        print(str(stare_curenta))
+                                        stare_curenta.tabla_joc.deseneaza_grid()
+                            if (afis_daca_final(stare_curenta)):
+                                break
+                            #stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
 
-        else:
-            t_inainte = int(round(time.time() * 1000))
-            if tip_algoritm == "minimax":
-                stare_actualizata = min_max(stare_curenta)
-            else:
-                stare_actualizata = alpha_beta(-500, 500, stare_curenta)
-            stare_curenta.tabla_joc = stare_actualizata.stare_aleasa.tabla_joc
-            print("Tabla dupa mutarea calculatorului")
-            print(str(stare_curenta))
-
-            stare_curenta.tabla_joc.deseneaza_grid()
-            t_dupa = int(round(time.time() * 1000))
-            print("Calculatorul a \"gandit\" timp de " + str(t_dupa - t_inainte) + " milisecunde.")
-            if (afis_daca_final(stare_curenta)):
-                break
-            stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
+        # else:
+        #     t_inainte = int(round(time.time() * 1000))
+        #     if tip_algoritm == "minimax":
+        #         stare_actualizata = min_max(stare_curenta)
+        #     else:
+        #         stare_actualizata = alpha_beta(-500, 500, stare_curenta)
+        #     stare_curenta.tabla_joc = stare_actualizata.stare_aleasa.tabla_joc
+        #     print("Tabla dupa mutarea calculatorului")
+        #     print(str(stare_curenta))
+        #
+        #     stare_curenta.tabla_joc.deseneaza_grid()
+        #     t_dupa = int(round(time.time() * 1000))
+        #     print("Calculatorul a \"gandit\" timp de " + str(t_dupa - t_inainte) + " milisecunde.")
+        #     if (afis_daca_final(stare_curenta)):
+        #         break
+        #     stare_curenta.j_curent = Joc.jucator_opus(stare_curenta.j_curent)
 
 if __name__ == "__main__":
     main()
